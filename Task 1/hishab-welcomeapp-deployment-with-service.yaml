@@ -1,0 +1,51 @@
+##############
+# Deployment #
+##############
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: welcomeapp-deployment
+spec:
+  selector:
+    matchLabels:
+      app: welcomeapp
+  replicas: 2 #Number of replica of application
+  template:
+    metadata:
+      labels:
+        app: welcomeapp
+    spec:
+      volumes:
+      - name: hishab-pv-storage
+        persistentVolumeClaim:
+          claimName: hishab-pv-claim #Shared volume PVC name where companyName.txt file will exists
+      containers:
+      - name: welcomeapp
+        image: registry.hishab.com/welcomeapp:latest #Assuming a example private repository url as registry.hishab.com
+        ports:
+        - containerPort: 80 #Assuming that container listing on port 80
+        volumeMounts:
+        - name: hishab-pv-storage
+          mountPath: /hishab_directory #Directory name where companyName.txt file will exists
+        restartPolicy: Always
+        imagePullPolicy: IfNotPresent #Only pull image if image is not present in the node
+---
+###########
+# Service #
+###########
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: welcomeapp-svc
+  namespace: welcomeapp
+  labels:
+    app: welcomeapp
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    nodePort: 30089
+  selector:
+    app: welcomeapp
