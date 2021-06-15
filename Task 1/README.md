@@ -1,5 +1,5 @@
 
-To apply kubernetes deployment file to cluster, use below command:
+To apply kubernetes deployment and service file to cluster, use below command:
 
 kubectl apply -f hishab-welcomeapp-deployment-with-service.yaml
 
